@@ -1,3 +1,16 @@
+## Additional Features Orjinal Repo
+    * Chararacter Spacing - based  [PDF STANDART 1.7](https://www.adobe.com/content/dam/acom/en/devnet/pdf/pdfs/PDF32000_2008.pdf)
+        ```
+            .
+            .
+            .
+            //func (f *Fpdf) SetFont(familyStr, styleStr string, size float64,characterSpace float64)
+            pdf.SetFont("Brandon-Reg", "", fontSize, characterSpace)
+
+            .
+            .
+            .
+        ```
 # gofpdf
 
 ![gofpdf](image/logo_gofpdf.jpg?raw=true "gofpdf")

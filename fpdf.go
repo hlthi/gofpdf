@@ -1631,7 +1631,7 @@ func (f *Fpdf) GetFontDesc(familyStr, styleStr string) FontDescType {
 // size is the font size measured in points. The default value is the current
 // size. If no size has been specified since the beginning of the document, the
 // value taken is 12.
-func (f *Fpdf) SetFont(familyStr, styleStr string, size float64) {
+func (f *Fpdf) SetFont(familyStr, styleStr string, size float64,characterSpace float64) {
 	// dbg("SetFont x %.2f, lMargin %.2f", f.x, f.lMargin)
 
 	if f.err != nil {
@@ -1698,7 +1698,7 @@ func (f *Fpdf) SetFont(familyStr, styleStr string, size float64) {
 	f.fontSize = size / f.k
 	f.currentFont = f.fonts[fontkey]
 	if f.page > 0 {
-		f.outf("BT /F%d %.2f Tf ET", f.currentFont.I, f.fontSizePt)
+		f.outf("BT %.2f Tc /F%d %.2f Tf ET", characterSpace, f.currentFont.I, f.fontSizePt)
 	}
 	return
 }
