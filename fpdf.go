@@ -1631,7 +1631,80 @@ func (f *Fpdf) GetFontDesc(familyStr, styleStr string) FontDescType {
 // size is the font size measured in points. The default value is the current
 // size. If no size has been specified since the beginning of the document, the
 // value taken is 12.
-func (f *Fpdf) SetFont(familyStr, styleStr string, size float64,characterSpace float64) {
+func (f *Fpdf) SetFont(familyStr, styleStr string, size float64) {
+	// dbg("SetFont x %.2f, lMargin %.2f", f.x, f.lMargin)
+
+	if f.err != nil {
+		return
+	}
+	// dbg("SetFont")
+	var ok bool
+	if familyStr == "" {
+		familyStr = f.fontFamily
+	} else {
+		familyStr = strings.ToLower(familyStr)
+	}
+	styleStr = strings.ToUpper(styleStr)
+	f.underline = strings.Contains(styleStr, "U")
+	if f.underline {
+		styleStr = strings.Replace(styleStr, "U", "", -1)
+	}
+	if styleStr == "IB" {
+		styleStr = "BI"
+	}
+	if size == 0.0 {
+		size = f.fontSizePt
+	}
+	// Test if font is already selected
+	if f.fontFamily == familyStr && f.fontStyle == styleStr && f.fontSizePt == size {
+		return
+	}
+	// Test if font is already loaded
+	fontkey := familyStr + styleStr
+	_, ok = f.fonts[fontkey]
+	if !ok {
+		// Test if one of the core fonts
+		if familyStr == "arial" {
+			familyStr = "helvetica"
+		}
+		_, ok = f.coreFonts[familyStr]
+		if ok {
+			if familyStr == "symbol" {
+				familyStr = "zapfdingbats"
+			}
+			if familyStr == "zapfdingbats" {
+				styleStr = ""
+			}
+			fontkey = familyStr + styleStr
+			_, ok = f.fonts[fontkey]
+			if !ok {
+				rdr := f.coreFontReader(familyStr, styleStr)
+				if f.err == nil {
+					f.AddFontFromReader(familyStr, styleStr, rdr)
+				}
+				if f.err != nil {
+					return
+				}
+			}
+		} else {
+			f.err = fmt.Errorf("undefined font: %s %s", familyStr, styleStr)
+			return
+		}
+	}
+	// Select it
+	f.fontFamily = familyStr
+	f.fontStyle = styleStr
+	f.fontSizePt = size
+	f.fontSize = size / f.k
+	f.currentFont = f.fonts[fontkey]
+	if f.page > 0 {
+		f.outf("BT /F%d %.2f Tf ET", f.currentFont.I, f.fontSizePt)
+	}
+	return
+}
+
+//setfontsize & setfontunitsize can break character space feature
+func (f *Fpdf) SetFontWithCharacterSpace(familyStr, styleStr string, size float64, characterSpace float64) {
 	// dbg("SetFont x %.2f, lMargin %.2f", f.x, f.lMargin)
 
 	if f.err != nil {

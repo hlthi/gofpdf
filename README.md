@@ -4,8 +4,9 @@
             .
             .
             .
-            // func (f *Fpdf) SetFont(familyStr, styleStr string, size float64,characterSpace float64)
-            pdf.SetFont("Brandon-Reg", "", fontSize, characterSpace)
+            // setfontsize & setfontunitsize can break character space feature
+            // func (f *Fpdf) SetFontWithCharacterSpace(familyStr, styleStr string, size float64, characterSpace float64)
+            pdf.SetFontWithCharacterSpace("Brandon-Reg", "", fontSize, characterSpace)
 
             .
             .
