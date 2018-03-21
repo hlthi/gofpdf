@@ -270,6 +270,7 @@ type FontLoader interface {
 
 // Fpdf is the principal structure for creating a single PDF document
 type Fpdf struct {
+	characterSpace	 float64				   // add feature : character spacing
 	page             int                       // current page number
 	n                int                       // current object number
 	offsets          []int                     // array of object offsets

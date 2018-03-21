@@ -818,12 +818,13 @@ func (f *Fpdf) GetStringWidth(s string) float64 {
 	if f.err != nil {
 		return 0
 	}
-	w := 0
+	var w float64 = 0.0
 	for _, ch := range []byte(s) {
 		if ch == 0 {
 			break
 		}
-		w += f.currentFont.Cw[ch]
+		w += float64(f.currentFont.Cw[ch]) + (f.characterSpace * f.fontSize * f.k) + (f.characterSpace*f.fontSize*f.k)/3
+		fmt.Println("W : ", w, "Space : ", f.characterSpace, "Font Size : ", f.fontSize, "Fk : ", f.k)
 	}
 	return float64(w) * f.fontSize / 1000
 }
@@ -1707,6 +1708,9 @@ func (f *Fpdf) SetFont(familyStr, styleStr string, size float64) {
 func (f *Fpdf) SetFontWithCharacterSpace(familyStr, styleStr string, size float64, characterSpace float64) {
 	// dbg("SetFont x %.2f, lMargin %.2f", f.x, f.lMargin)
 
+	//set character space for pointer
+	f.characterSpace = characterSpace
+
 	if f.err != nil {
 		return
 	}
@@ -2229,7 +2233,11 @@ func (f *Fpdf) MultiCell(w, h float64, txtStr, borderStr, alignStr string, fill 
 			ls = l
 			ns++
 		}
-		l += float64(cw[c])
+		/*
+			Line break fix by character space.
+			@author hlthi
+		 */
+		l += float64(cw[c]) + (f.characterSpace * f.fontSize * f.k) + (f.characterSpace*f.fontSize*f.k)/3.0
 		if l > wmax {
 			// Automatic line break
 			if sep == -1 {
